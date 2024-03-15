@@ -33,7 +33,8 @@ Table facility{
   standards_area_2 varchar [note: "common code"]
   discharge_river varchar
   disinfection_method varchar [note: "common code"]
-  phosphorus_treatment double 
+  phosphorus_treatment double
+  digester_operation varchar
   sewage_waste_method varchar [note: "multiple method"]
   renewable_energy_facilities varchar [note: "multiple facility"]
   link_facility varchar [note: "multiple facility"]
@@ -46,7 +47,7 @@ Table facility{
   evaluation_end date
 }
 
-Table facility_wq{
+Table facility_dwq{
   facility_id int
   submit_date date
   type varchar [note: "common code"]
@@ -57,7 +58,20 @@ Table facility_wq{
   tp double
   ecoli double
   ecotoxicity double
+}
+
+Table facility_rwq{
+  facility_id int
+  submit_date date
+  type varchar [note: "common code"]
   total_output double
+  bod double
+  toc double
+  ss double
+  tn double
+  tp double
+  ecoli double
+  ecotoxicity double
 }
 
 Table facility_link{
@@ -66,24 +80,6 @@ Table facility_link{
   link_machine varchar [note:"machine array" ]
   link_cycle varchar
 }
-
-// Table facility_owq{
-//   facility_id int
-//   submit_date date
-//   ype varchar [note: "common code"]
-//   bod double
-//   toc double
-//   ss double
-//   tn double
-//   tp double
-//   ecoli double
-//   ecotoxicity double
-// }
-
-// ref: facility_owq.facility_id> facility.id
-
-
-
 
 Table treatment_plant{
   id int [primary key]
@@ -257,7 +253,9 @@ Table evaluation_error{
 }
 
 
-ref: facility_wq.facility_id> facility.id
+Ref: "facility_dwq"."facility_id"> "facility"."id"
+
+Ref: "facility_rwq"."facility_id"> "facility"."id"
 
 Ref: "facility"."id" < "treatment_plant"."facility_id"
 
