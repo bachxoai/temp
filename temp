@@ -1,0 +1,294 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+Table region {
+  region_code int [primary key]
+  name varchar
+  local_goverment_name varchar
+}
+
+Table vendor{
+  id int [primary key]
+  name varchar
+  representative_name varchar
+  representative_tel varchar
+  local_gov_pic_name varchar
+  local_gov_pic_tel varchar
+  local_gov_pic_department varchar
+}
+
+Table facility{
+  id int [primary key]
+  region_code int
+  vendor_id int
+  name varchar
+  short_name varchar
+  address varchar
+  capacity double
+  sewage_treatment_population int
+  site_area double
+  treatment_area double
+  pipeline_management double
+  sewage_drainage_method varchar [note: "common code"]
+  standards_area_1 varchar [note: "common code"]
+  standards_area_2 varchar [note: "common code"]
+  discharge_river varchar
+  disinfection_method varchar [note: "common code"]
+  phosphorus_treatment double 
+  sewage_waste_method varchar [note: "multiple method"]
+  renewable_energy_facilities varchar [note: "multiple facility"]
+  link_facility varchar [note: "multiple facility"]
+  installation_date date
+  data_utilization_date date
+  resident_friendly_facilities varchar
+  operating_staff_capacity int
+  current_operating_staff int
+  evaluation_start date
+  evaluation_end date
+}
+
+Table facility_wq{
+  facility_id int
+  submit_date date
+  type varchar [note: "common code"]
+  bod double
+  toc double
+  ss double
+  tn double
+  tp double
+  ecoli double
+  ecotoxicity double
+  total_output double
+}
+
+Table facility_link{
+  source_id int
+  target_id int
+  link_machine varchar [note:"machine array" ]
+  link_cycle varchar
+}
+
+// Table facility_owq{
+//   facility_id int
+//   submit_date date
+//   ype varchar [note: "common code"]
+//   bod double
+//   toc double
+//   ss double
+//   tn double
+//   tp double
+//   ecoli double
+//   ecotoxicity double
+// }
+
+// ref: facility_owq.facility_id> facility.id
+
+
+
+
+Table treatment_plant{
+  id int [primary key]
+  facility_id int
+  type varchar [note: " 하수처리시설, 분뇨처리시설, 찌꺼기처리시설, 하수관로"]
+  scale  varchar [note: "Simple, Complex"]
+  treatment_method varchar [note: "common code"]
+
+}
+
+Table treatment_plant_wq{
+  treatment_plant_id int
+  submit_date date
+  submit_year varchar
+  submit_month varchar
+  in_bod double
+  in_toc double
+  in_ss double
+  in_tn double
+  in_tp double
+  in_ecoli double
+  in_flow double
+  out_bod double
+  out_toc double
+  out_ss double
+  out_tn double
+  out_tp double
+  out_ecoli double
+  out_flow double
+}
+
+
+
+Table common_code{
+  code varchar [primary key]
+  code_name varchar 
+  group_code varchar [primary key]
+  group_name varchar 
+}
+
+Table contract{
+  id id [primary key]
+  facility_id id
+  start_contract date
+  end_contract date
+  evaluation_start date
+  evaluation_end date
+  evaluation_year varchar
+  evaluation_month varchar
+  evaluation_application_date date
+  contract_type varchar
+  evaluation_type varchar
+  local_gov_rep_dep varchar
+  local_gov_rep_name varchar
+  local_gov_rep_tel varchar
+  pic id
+  pic_dep varchar
+  agency_managerment varchar
+}
+
+Table contract_fee{
+  id int [primary key]
+  contract_id int
+  publish_date date
+  payment_year varchar
+  request_date varchar
+  deposit_date varchar
+  amount double
+}
+
+Table user{
+  id int [primary key]
+}
+
+Table employee_yop{
+  id int
+  facility_id int
+  name varchar
+  department varchar
+  start_date date
+  end_date date
+  yop double
+  in_out varchar
+  job varchar
+}
+
+Table evaluation{
+  id int [primary key]
+  contract_id int
+  facility_id int
+  evaluation_start date
+  evaluation_end date
+  evaluation_year varchar
+  evaluation_month varchar
+  evaluation_application_date date
+  pic id
+  status int
+}
+
+Table evaluation_1_1{
+  id int [primary key]
+  evaluation_id int
+
+}
+
+Table evaluation_1_2{
+  id int [primary key]
+  evaluation_id int
+  employee_id varchar
+  employee_name varchar
+  evaluation_start date
+  evaluation_end date
+  start_yop double
+  start_weight double
+  end_yop double
+  end_weight double
+  "note" varchar
+}
+
+Table evaluation_1_3{
+  id int [primary key]
+  evaluation_id int
+  employee_id varchar
+  employee_name varchar
+  job varchar
+  job_detail varchar
+  start_date date
+  end_date date
+  yop double
+}
+
+Table entity_mapping{
+  id int [primary key]
+  table_id varchar
+  table_name varchar
+  field_id varchar
+  
+}
+
+Table documents{
+  id int [primary key]
+  evaluation_id int
+  orgin_name varchar
+  evaluation_type varchar
+  status int
+  file_path varchar
+  created_date datetime
+  created_by int
+  updated_date datetime
+  updated_by int
+}
+
+Table document_error{
+  id int [primary key]
+  document_id int
+  error_code varchar
+  detail varchar
+  row_no varchar
+  column_no varchar
+  
+}
+
+Table evaluation_error{
+  id int [primary key]
+  evaluation_id int
+  evaluation_type varchar
+  error_code varchar
+  detail varchar
+  step varchar
+  step_name varchar
+}
+
+
+ref: facility_wq.facility_id> facility.id
+
+Ref: "facility"."id" < "treatment_plant"."facility_id"
+
+Ref: "vendor"."id" < "facility"."vendor_id"
+
+Ref: "region"."region_code" < "facility"."region_code"
+
+Ref: "user"."id" < "contract"."pic"
+
+Ref: "contract"."facility_id" < "facility"."id"
+
+Ref: "contract"."id" < "contract_fee"."contract_id"
+
+Ref: "facility_link"."source_id" < "facility"."id"
+
+Ref: "facility_link"."target_id" < "facility"."id"
+
+Ref: "treatment_plant"."id" < "treatment_plant_wq"."treatment_plant_id"
+
+Ref: "facility"."id" < "employee_yop"."facility_id"
+
+Ref: "contract"."id" < "evaluation"."id"
+
+Ref: "evaluation"."id" < "evaluation_1_1"."evaluation_id"
+
+Ref: "evaluation"."id" < "evaluation_1_2"."evaluation_id"
+
+Ref: "evaluation"."id" < "evaluation_1_3"."evaluation_id"
+
+Ref: "user"."id" < "evaluation"."pic"
+
+Ref: "evaluation"."id" < "documents"."evaluation_id"
+
+Ref: "documents"."id" < "document_error"."document_id"
